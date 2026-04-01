@@ -1,0 +1,5 @@
+{
+  "name": "Croqodil Image-to-Prompt",
+  "description": "Professional AI image analysis tool that generates detailed prompts and visual DNA from images using Gemini 2.0 Flash.",
+  "requestFramePermissions": []
+}
