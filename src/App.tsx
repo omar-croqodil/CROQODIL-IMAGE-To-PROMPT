@@ -55,13 +55,13 @@ export default function App() {
 
   // Load API Key
   useEffect(() => {
-    const saved = sessionStorage.getItem('gemini_api_key');
+    const saved = sessionStorage.getItem('openrouter_api_key');
     if (saved) setApiKey(saved);
   }, []);
 
   const handleApiKeyChange = (val: string) => {
     setApiKey(val);
-    sessionStorage.setItem('gemini_api_key', val);
+    sessionStorage.setItem('openrouter_api_key', val);
   };
 
   const addToast = (message: string, type: 'info' | 'error' = 'info') => {
@@ -113,27 +113,35 @@ export default function App() {
     setIsAnalyzing(true);
     setOutput('');
 
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+    const url = `https://openrouter.ai/api/v1/chat/completions`;
     
     try {
       const response = await fetch(url, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`,
+          'HTTP-Referer': window.location.origin,
+          'X-Title': 'Croqodil Image-to-Prompt'
+        },
         body: JSON.stringify({
-          contents: [{
-            parts: [
-              { text: SYSTEM_PROMPTS[activeTab] },
-              { inline_data: { mime_type: "image/jpeg", data: dataToSend } }
+          model: 'google/gemini-2.0-flash-exp:free',
+          messages: [{
+            role: 'user',
+            content: [
+              { type: 'text', text: SYSTEM_PROMPTS[activeTab] },
+              { type: 'image_url', image_url: { url: `data:image/jpeg;base64,${dataToSend}` } }
             ]
           }],
-          generationConfig: { temperature: 0.4, maxOutputTokens: 2048 }
+          temperature: 0.4,
+          max_tokens: 2048
         })
       });
 
       const data = await response.json();
       if (data.error) throw new Error(data.error.message || "API Error");
 
-      const rawText = data.candidates[0].content.parts[0].text;
+      const rawText = data.choices[0].message.content;
       let cleanJson = rawText.trim();
       if (cleanJson.startsWith('```')) {
         cleanJson = cleanJson.replace(/^```json\n?/, '').replace(/\n?```$/, '');
@@ -251,7 +259,7 @@ export default function App() {
               value={apiKey}
               onChange={(e) => handleApiKeyChange(e.target.value)}
               className={`w-full bg-[#111111] border border-[#1A1A1A] rounded-full py-3 px-6 pr-14 text-[#F5F5F0] focus:outline-none focus:border-[#C9A84C] focus:ring-1 focus:ring-[#C9A84C]/20 transition-all ${apiKey ? 'border-[#4CAF50]' : ''}`}
-              placeholder="Enter your free Google AI Studio API key"
+              placeholder="Enter your free OpenRouter API key"
             />
             <button 
               onClick={() => setShowKey(!showKey)}
@@ -267,8 +275,8 @@ export default function App() {
             >
               <FileText size={12} /> Deployment Guide
             </button>
-            <a href="https://aistudio.google.com/apikey" target="_blank" rel="noreferrer" className="text-[0.75rem] text-[#666660] hover:text-[#C9A84C] transition-colors">
-              Get free API key →
+            <a href="https://openrouter.ai/keys" target="_blank" rel="noreferrer" className="text-[0.75rem] text-[#666660] hover:text-[#C9A84C] transition-colors">
+              Get free OpenRouter API key →
             </a>
           </div>
         </section>
@@ -374,7 +382,7 @@ export default function App() {
               {isAnalyzing && (
                 <div className="absolute inset-0 bg-[#0D0D0D]/90 flex flex-col justify-center items-center gap-4 z-10">
                   <div className="w-10 h-10 border-4 border-[#C9A84C]/10 border-t-[#C9A84C] rounded-full animate-spin" />
-                  <div className="text-[#C9A84C] font-semibold">Analyzing with Gemini...</div>
+                  <div className="text-[#C9A84C] font-semibold">Analyzing with OpenRouter...</div>
                 </div>
               )}
             </div>
@@ -422,7 +430,7 @@ export default function App() {
         </div>
         <div className="flex items-center gap-2 bg-[#111111] py-1.5 px-4 rounded-full border border-[#1A1A1A] text-[0.75rem] text-[#C9A84C] font-semibold">
           <div className="w-1.5 h-1.5 rounded-full bg-[#C9A84C] shadow-[0_0_8px_#C9A84C] animate-pulse" />
-          Powered by Gemini
+          Powered by OpenRouter
         </div>
       </footer>
 
