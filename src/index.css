@@ -1,1 +1,55 @@
 @import "tailwindcss";
+
+@theme {
+  --font-cinzel: "Cinzel", serif;
+  --font-dm-sans: "DM Sans", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+  
+  --background-gold-gradient: linear-gradient(135deg, #8B6914, #C9A84C, #E8C96B, #C9A84C, #8B6914);
+}
+
+@layer base {
+  body {
+    @apply bg-[#0A0A0A] text-[#F5F5F0] font-sans;
+  }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+.animate-shimmer {
+  animation: shimmer 6s linear infinite;
+}
+
+.bg-gold-gradient {
+  background: var(--background-gold-gradient);
+}
+
+/* Print styles for Deployment Guide */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #printable-guide, #printable-guide * {
+    visibility: visible;
+  }
+  #printable-guide {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    background: white !important;
+    color: black !important;
+    padding: 40px;
+  }
+  #printable-guide pre {
+    background: #f5f5f5 !important;
+    color: #333 !important;
+    border: 1px solid #ddd;
+  }
+  #printable-guide h1, #printable-guide h2 {
+    color: #8B6914 !important;
+  }
+}
